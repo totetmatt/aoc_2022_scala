@@ -7,7 +7,6 @@ object Day_05 extends App {
    {
   val warehouse : mutable.Map[Int,mutable.Seq[Char]] = mutable.Map.empty[Int,mutable.Seq[Char]]
   warehouse.withDefaultValue(mutable.Seq.empty[Char])
-  val pattern = """more (\d+) from (\d+) to (\d+)""".r
 
   val p1 = Source.fromFile(filename)
     .getLines
