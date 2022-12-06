@@ -1,1 +1,1 @@
-object Day_06 extends App {Seq(4,14).foreach(x=>println(scala.io.Source.fromFile("input/day_06/input").mkString.sliding(x).indexWhere(_.toSet.size==x)+x))}
+object Day_06 extends App {println(Seq(4,14).map(x=>scala.io.Source.fromFile("input/day_06/input").mkString.sliding(x).indexWhere(_.toSet.size==x)+x))}
