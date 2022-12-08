@@ -14,45 +14,46 @@ object Day_08 extends App {
   val width = theMap.head._1.size
 
 
+
   { // Part 1
-    val lineScan = theMap.flatMap { case (line, y) =>
-      line.foldLeft(Seq(line.head))((acc, el) => if (acc.last._1 < el._1) acc :+ el else acc).toSet
-        .union(
-          line.foldRight(Seq(line.last))((el, acc) => if (acc.last._1 < el._1) acc :+ el else acc).toSet
-        ).map { case (_, x) => (y, x) }.toSeq.sorted
 
+    // Returns the Set of visible tree on left and right
+    def computeSet(map:Seq[(Seq[(Int,Int)],Int)]) = {
+        map.flatMap { case (line, y) =>
+          (
+              line.foldLeft (Seq(line.head))((acc, el) => if (acc.last._1 < el._1) acc :+ el else acc).toSet ++
+              line.foldRight(Seq(line.last))((el, acc) => if (acc.last._1 < el._1) acc :+ el else acc).toSet
+            )
+            .map { case (_, x) => (y, x) }
+            .toSeq
+
+        }.toSet
     }
-    val columnScan = (0 until width)
-      .map(x => (
-        theMap
-          .map(_._1(x)._1).zipWithIndex, x)
-      )
-      .flatMap { case (line, x) =>
-        line.foldLeft(Seq(line.head))((acc, el) => if (acc.last._1 < el._1) acc :+ el else acc).toSet
-          .union(
-            line.foldRight(Seq(line.last))((el, acc) => if (acc.last._1 < el._1) acc :+ el else acc).toSet
-          ).map { case (_, y) => (y, x) }
 
-      }
-    println(lineScan.toSet.union(columnScan.toSet).size)
+
+    val part1 = (
+                    computeSet(theMap) ++ // lineScan
+                    computeSet((0 until width).map(x => (theMap.map(_._1(x)._1).zipWithIndex, x))) // columnScan = Map rotated to have scanLine
+                )
+                .size
+    println(part1)
   }
   { // Part 2
+
+
+    def distance(line:(Seq[(Int,Int)],Seq[(Int,Int)])) = {
+      line._1.size + {
+        if (line._2.isEmpty) 0 else 1
+      }
+    }
+
     val lineScan = theMap.flatMap { case (line, y) =>
       line.map { case (sapin, x) =>
         val (l, r) = line.splitAt(x)
-
-        val rSpan = r.tail.span(_._1 < sapin)
-        val rScore = rSpan._1.size + {
-          if (rSpan._2.isEmpty) 0 else 1
-        }
-        val lSpan = l.reverse.span(_._1 < sapin)
-        val lScore = lSpan._1.size + {
-          if (lSpan._2.isEmpty) 0 else 1
-        }
+        val rScore =distance(r.tail.span(_._1 < sapin))
+        val lScore =distance(l.reverse.span(_._1 < sapin))
         ((y, x), lScore * rScore)
       }
-
-
     }
 
     val columnScan = (0 until width)
@@ -63,14 +64,8 @@ object Day_08 extends App {
       .flatMap { case (col, x) =>
         col.map { case (sapin, y) =>
           val (l, r) = col.splitAt(y)
-          val rSpan = r.tail.span(_._1 < sapin)
-          val rScore = rSpan._1.size + {
-            if (rSpan._2.isEmpty) 0 else 1
-          }
-          val lSpan = l.reverse.span(_._1 < sapin)
-          val lScore = lSpan._1.size + {
-            if (lSpan._2.isEmpty) 0 else 1
-          }
+          val rScore = distance(r.tail.span(_._1 < sapin))
+          val lScore = distance(l.reverse.span(_._1 < sapin))
           ((y, x), lScore * rScore)
         }
       }
