@@ -40,3 +40,5 @@ object Day_07 extends App {
    }.reduce((a,b)=> if(a._2 < b._2) a else b)
   println(s"part2 $part2")
 }
+
+
